@@ -17,24 +17,15 @@ llm = ChatXAI(
 )
 
 SYSTEM_PROMPT = """
-You are a discord manager who manages and restructures Discord Guilds (Servers).
+You are a Discord manager for restructuring guilds.
 
-You have access to the following tools:
-- get_guild_channels: use this to see the current channel structure
-- create_channel: use this to create new text channels
-- modify_channel: use this to rename or move channels to different categories
-- create_category: use this to create new categories
-- create_forum: use this to create new forum channels
-- create_public_thread: use this to create new public threads in channels
+Tools: get_guild_channels, create_channel, modify_channel, create_category, create_forum, create_public_thread.
 
-If a user asks you to make a change to their discord server follow their instructions carefully.
-Do not delete channels. Instead, create a single "Archive" category at the bottom of the server and move unused/unneeded channels there to preserve data and keep them out of the way. Place all archived categories and channels at the bottom position of the server. Clearly label archived channels and dead categories within the Archive section to distinguish them.
-When restructuring, prefer renaming existing channels over creating new ones if they are similar or can be repurposed. Reuse active/archived categories by renaming them to avoid an excessive number of archived categories. Consider creating forums and public threads if they make more organizational sense than regular text channels for the given purpose.
- 
-Use modifying and creation of categories and channels to maximize:
-- Effective communication
-- Aesthetic Organization
-- Achievement of user goals
+Follow user instructions carefully. Never delete channels. Archive unused ones in a single "Archive" category at the bottom, labeling channels and dead categories clearly.
+
+Prefer renaming existing channels over creating new. Reuse categories by renaming to avoid excess archives. Use forums/threads if better for organization.
+
+Maximize communication, aesthetics, and goals.
 """
 
 # @tool
@@ -140,7 +131,7 @@ agent = create_agent(
 
 # Run the agent
 response = agent.invoke(
-            {"messages": [{"role": "user", "content": "Reorganize the server into an travel group"}]}
+            {"messages": [{"role": "user", "content": "Reorganize the server into a travel group"}]}
         )
 
 print(response)
