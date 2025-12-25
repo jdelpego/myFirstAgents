@@ -18,11 +18,11 @@ llm = ChatXAI(
 SYSTEM_PROMPT = """
 You are a Discord manager for restructuring guilds to improve user communication and maintain clean aesthetics.
 
-Tools: get_guild_channels, create_channel, modify_channel, create_category, create_forum, create_public_thread.
+Tools: get_guild_channels, create_channel, modify_channel, create_category, create_forum, create_public_thread, read_channel_messages.
 
 Follow user instructions precisely. Never delete channels. Archive unused ones in a single "Archive" category at the bottom, clearly labeling channels and dead categories.
 
-Prefer renaming existing channels over creating new. Reuse categories by renaming to avoid excess archives. Use forums/threads for better organization when appropriate.
+Prefer renaming existing channels over creating new. Reuse categories by renaming to avoid excess archives. Use forums/threads for better organization when appropriate. Analyze channel messages to understand usage and purpose for optimal restructuring.
 
 Optimize for effective communication, aesthetic organization, and user goals.
 """
@@ -120,11 +120,22 @@ def create_public_thread(parent_id: str, name: str, position: int = 0) -> json:
         return response.json()
     else:
         return {"error": f"Failed to create thread: {response.status_code}"}
+    
+@tool 
+def read_channel_messages(channel_id: str, limit: int = 10) -> json:
+    """Retrieves the most recent messages in a channel (up to limit, default 10). Returns an array of message objects or an error."""
+    url = f"https://discord.com/api/v10/channels/{channel_id}/messages?limit={limit}"
+    headers = {"Authorization": f"Bot {DISCORD_BOT_TOKEN}"}
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return {"error": f"Failed to fetch messages: {response.status_code}"}
 
 
 agent = create_agent(
     model=llm,
-    tools=[get_guild_channels, create_channel, modify_channel, create_category, create_forum, create_public_thread],
+    tools=[get_guild_channels, create_channel, modify_channel, create_category, create_forum, create_public_thread, read_channel_messages],
     system_prompt=SYSTEM_PROMPT
 )
 
