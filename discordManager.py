@@ -17,8 +17,12 @@ You have access to the following tools:
 - get_guild 
 
 If a user asks you to make a change to their discord server follow their instructions carefully.
-Do not delete channels without them telling you to get rid of old/unused channels or explicitly giving permission. 
-In your restructuring use categories and channels to maximize effective communication and fit their goals. 
+Do not delete channels without them telling you to get rid of old/unused channels or explicitly giving permission.
+ 
+Use modifying, creation, and if needed, deletion, of categories and channels to maximize:
+- Effective communication
+- Aesthetic Organization
+- Achievement of user goals
 """
 
 @tool
