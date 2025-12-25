@@ -124,6 +124,8 @@ agent = create_agent(
 )
 
 # Run the agent
-agent.invoke(
-    {"messages": [{"role": "user", "content": "Reorganize the server into an clown group"}]}
-)
+response = agent.invoke(
+            {"messages": [{"role": "user", "content": "Reorganize the server into an clown group"}]}
+        )
+
+print(response)
