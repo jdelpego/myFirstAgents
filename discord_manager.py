@@ -101,12 +101,15 @@ def create_category(name: str) -> json:
     
 @dataclass
 class ResponseFormat:
+    completed_actions: list[str]
+    final_summary: str
 
 
 agent = create_agent(
     model="claude-sonnet-4-5-20250929",
     tools=[print_message, get_guild_channels, delete_channel, create_channel, modify_channel, create_category],
-    system_prompt="You are a helpful assistant",
+    system_prompt=SYSTEM_PROMPT,
+    response_format= ToolStrategy(ResponseFormat)
 )
 
 # Run the agent
