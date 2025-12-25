@@ -12,9 +12,9 @@ DISCORD_GUILD_ID = os.environ.get("DISCORD_GUILD_ID")
 DISCORD_BOT_TOKEN = os.environ.get("DISCORD_BOT_TOKEN")
 XAI_API_KEY = os.environ.get("XAI_API_KEY")
 
-llm = "ChatXAI(
+llm = ChatXAI(
     model="grok-4-1-fast-reasoning"    
-)"
+)
 
 SYSTEM_PROMPT = """
 You are a discord manager who manages and restructures Discord Guilds (Servers).
