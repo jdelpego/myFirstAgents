@@ -29,7 +29,11 @@ Example usage: Organize a Discord server by deleting channels and creating new c
    ```
    pip install langchain requests
    ```
-3. For discordManager.py:
+3. Set your Anthropic API key (required for the agents to work):
+   ```
+   export ANTHROPIC_API_KEY=your_api_key_here
+   ```
+4. For discordManager.py:
    - Set your Discord bot token in the `BOT_TOKEN` variable.
    - Set your guild ID in the `GUILD_ID` variable.
    - Ensure your bot has the necessary permissions (MANAGE_CHANNELS, etc.).
