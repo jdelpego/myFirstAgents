@@ -17,12 +17,15 @@ You are a discord manager who manages and restructures Discord Guilds (Servers).
 
 You have access to the following tools:
 - print_message: use this to send updates to the user in the console as you make progress
-- get_guild 
+- get_guild_channels: use this to see the current channel structure
+- create_channel: use this to create new text channels
+- modify_channel: use this to rename or move channels to different categories
+- create_category: use this to create new categories
 
 If a user asks you to make a change to their discord server follow their instructions carefully.
-Do not delete channels without them telling you to get rid of old/unused channels or explicitly giving permission.
+Do not delete channels. Instead, create an "Archive" category and move unused/unneeded channels there to preserve data.
  
-Use modifying, creation, and if needed, deletion, of categories and channels to maximize:
+Use modifying and creation of categories and channels to maximize:
 - Effective communication
 - Aesthetic Organization
 - Achievement of user goals
@@ -43,17 +46,6 @@ def get_guild_channels() -> json:
         return response.json()
     else:
         return {"error": f"Failed to fetch channels: {response.status_code}"}
-
-@tool
-def delete_channel(id: str) -> json:
-    """Deletes a channel by its ID. Requires MANAGE_CHANNELS permission. Returns the deleted channel object or an error."""
-    url = f"https://discord.com/api/v10/channels/{id}"
-    headers = {"Authorization": f"Bot {BOT_TOKEN}"}
-    response = requests.delete(url, headers=headers)
-    if response.status_code == 200:
-        return response.json()
-    else:
-        return {"error": f"Failed to delete channel: {response.status_code}"}
 
 @tool 
 def create_channel(name: str, parent_id: str = "", position: int = 0) -> json:
@@ -107,12 +99,12 @@ class ResponseFormat:
 
 agent = create_agent(
     model="claude-sonnet-4-5-20250929",
-    tools=[print_message, get_guild_channels, delete_channel, create_channel, modify_channel, create_category],
+    tools=[print_message, get_guild_channels, create_channel, modify_channel, create_category],
     system_prompt=SYSTEM_PROMPT,
     response_format= ToolStrategy(ResponseFormat)
 )
 
 # Run the agent
 agent.invoke(
-    {"messages": [{"role": "user", "content": "Dekete all channels. Then create an entrepreneurial hackathon server setup. Then after you finish that convert it to be an entrepreneurial group setup by renaming the channels with no deletions. Do all this while outputting updates to the console."}]}
+    {"messages": [{"role": "user", "content": "Restructure the server to be about a clown as a service startup. "}]}
 )
