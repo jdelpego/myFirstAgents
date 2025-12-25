@@ -3,9 +3,7 @@ import json
 import requests
 from dotenv import load_dotenv
 from langchain.tools import tool
-from dataclasses import dataclass
 from langchain.agents import create_agent
-from langchain.agents.structured_output import ToolStrategy
 
 
 load_dotenv()
@@ -117,21 +115,15 @@ def create_public_thread(parent_id: str, name: str, position: int = 0) -> json:
         return response.json()
     else:
         return {"error": f"Failed to create thread: {response.status_code}"}
-    
-@dataclass
-class ResponseFormat:
-    completed_actions: list[str]
-    final_summary: str
 
 
 agent = create_agent(
     model="claude-sonnet-4-5-20250929",
     tools=[print_message, get_guild_channels, create_channel, modify_channel, create_category, create_forum, create_public_thread],
-    system_prompt=SYSTEM_PROMPT,
-    response_format= ToolStrategy(ResponseFormat)
+    system_prompt=SYSTEM_PROMPT
 )
 
 # Run the agent
 agent.invoke(
-    {"messages": [{"role": "user", "content": "Restructure the server to be about a clown entrepreneurial group"}]}
+    {"messages": [{"role": "user", "content": "Reorganize the server into an clown group"}]}
 )
