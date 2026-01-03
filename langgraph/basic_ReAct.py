@@ -1,46 +1,41 @@
 from operator import add
 from langchain.tools import tool
 from langchain_xai import ChatXAI
-from typing_extensions import TypedDict, List, Annotated
-from langgraph.graph import StateGraph, START, END
-from langchain_core.messages import BaseMessage
+from langgraph.graph import MessagesState, StateGraph, START, END
 from langchain.messages import SystemMessage, HumanMessage, ToolMessage
 
+
+count = 4
 
 llm = ChatXAI(
     model="grok-4-1-fast-reasoning"    
 )
-
-class State(TypedDict):
-    count: int
-    # Use a reducer to define state so each node (not tool) only needs to return modified parameters
-    messages: Annotated[List[BaseMessage], add]
-    
-
 # Tools
 @tool
-def add_x(state: State, x: int) -> None:
-    """Adds x to the current count in state"""
-    state["count"] += x
+def add_x(x: int) -> int:
+    """Adds int x to the current count values and returns the count value"""
+    global count
+    count += x
+    return count
 
 @tool
-def print_message(message: str) -> None:
+def print_to_console(message: str) -> None:
     """Print a message to the console."""
     print(message)
     
-tools = [add_x, print_message]
+tools = [add_x, print_to_console]
 tools_by_name = {tool.name: tool for tool in tools}
 llm_with_tools = llm.bind_tools(tools)
 
 # Nodes
-def llm_call(state: State):
+def llm_call(state: MessagesState):
     "LLM decides wether to call a tool or not."
     llm_response = llm_with_tools.invoke(
         [SystemMessage(content="You are a helpful assistant.")] + state["messages"]
     )
     return {"messages": [llm_response]}
     
-def tool_node(state: State):
+def tool_node(state: MessagesState):
     """Performs the tool call"""
     result = []
     for tool_call in state["messages"][-1].tool_calls:
@@ -50,14 +45,14 @@ def tool_node(state: State):
     return {"messages": result}
     
 # Conditional edges
-def should_continue(state: State) -> bool:
+def should_continue(state: MessagesState) -> bool:
     last_message = state["messages"][-1]
     if last_message.tool_calls:
         return True
     return False    
 
 # Build graph
-agent_builder = StateGraph(State)
+agent_builder = StateGraph(MessagesState)
 agent_builder.add_node("llm_call", llm_call)
 agent_builder.add_node("tool_node", tool_node)
 agent_builder.add_edge(START, "llm_call")
@@ -73,8 +68,7 @@ agent_builder.add_edge("tool_node","llm_call")
 agent = agent_builder.compile()
 
 result = agent.invoke({
-    "messages": [HumanMessage(content="Add 7 to the intial count, print it out to console, then subtract 3 print it out. Print nothing else.")],
-    "count": 4
+    "messages": [HumanMessage(content="Get the count to equal 7")]   
     })
 
 for m in result["messages"]:
