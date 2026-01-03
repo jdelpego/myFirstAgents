@@ -13,13 +13,14 @@ llm = ChatXAI(
 class State(TypedDict):
     count: int
     messages: List[BaseMessage]
+    
 
 # Tools
 @tool
 def add_x(state: State, x: int) -> State:
     """Adds x to the current count in state"""
-    return {"messages": state["messages"],
-            "count": state["count"] + x}
+    return {"count": state["count"] + x
+            , "messages": state["messages"]}
 
 @tool
 def print_message(message: str) -> None:
