@@ -1,10 +1,9 @@
 from langchain.tools import tool
 from langchain_xai import ChatXAI
-from IPython.display import Image, display
 from typing_extensions import TypedDict, List
 from langgraph.graph import StateGraph, START, END
-
-from langchain.messages import SystemMessage, HumanMessage, ToolMessage, BaseMessage
+from langchain_core.messages import BaseMessage
+from langchain.messages import SystemMessage, HumanMessage, ToolMessage
 
 
 llm = ChatXAI(
@@ -75,8 +74,6 @@ agent_builder.add_conditional_edges(
 )
 agent_builder.add_edge("tool_node","llm_call")
 agent = agent_builder.compile()
-
-display(Image(agent.get_graph(xray=True).draw_mermaid_png()))
 
 result = agent.invoke({
     "messages": [HumanMessage(content="lol")],
