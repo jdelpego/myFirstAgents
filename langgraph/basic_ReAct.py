@@ -1,6 +1,8 @@
 from langchain.tools import tool
 from langchain_xai import ChatXAI
-from typing_extensions import TypedDict
+from typing_extensions import TypedDict, List
+from langgraph.graph import MessagesState
+from langchain.messages import SystemMessage, HumanMessage, ToolMessage, BaseMessage
 
 
 llm = ChatXAI(
@@ -9,6 +11,7 @@ llm = ChatXAI(
 
 class State(TypedDict):
     count: int
+    messages: List[BaseMessage]
 
 @tool
 def add_x(state: State, x: int) -> State:
@@ -23,3 +26,4 @@ def print_message(message: str) -> None:
 tools = [add_x, print_message]
 tools_by_name = {tool.name: tool for tool in tools}
 llm_with_tools = llm.bind_tools(tools)
+
