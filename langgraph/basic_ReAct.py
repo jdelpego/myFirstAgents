@@ -1,6 +1,7 @@
+from operator import add
 from langchain.tools import tool
 from langchain_xai import ChatXAI
-from typing_extensions import TypedDict, List
+from typing_extensions import TypedDict, List, Annotated
 from langgraph.graph import StateGraph, START, END
 from langchain_core.messages import BaseMessage
 from langchain.messages import SystemMessage, HumanMessage, ToolMessage
@@ -12,15 +13,15 @@ llm = ChatXAI(
 
 class State(TypedDict):
     count: int
-    messages: List[BaseMessage]
+    # Use a reducer to define state so each node (not tool) only needs to return modified parameters
+    messages: Annotated[List[BaseMessage], add]
     
 
 # Tools
 @tool
-def add_x(state: State, x: int) -> State:
+def add_x(state: State, x: int) -> None:
     """Adds x to the current count in state"""
-    return {"count": state["count"] + x
-            , "messages": state["messages"]}
+    state["count"] += x
 
 @tool
 def print_message(message: str) -> None:
@@ -37,10 +38,7 @@ def llm_call(state: State):
     llm_response = llm_with_tools.invoke(
         [SystemMessage(content="You are a helpful assistant.")] + state["messages"]
     )
-    return {
-        "messages": llm_response,
-        "count": state["count"]
-    }
+    return {"messages": [llm_response]}
     
 def tool_node(state: State):
     """Performs the tool call"""
@@ -49,11 +47,9 @@ def tool_node(state: State):
         tool = tools_by_name[tool_call["name"]]
         observation = tool.invoke(tool_call["args"])
         result.append(ToolMessage(content=observation, tool_call_id=tool_call["id"]))
-    return {"messages": result,
-            "count": state["count"]}
+    return {"messages": result}
     
 # Conditional edges
-
 def should_continue(state: State) -> bool:
     last_message = state["messages"][-1]
     if last_message.tool_calls:
@@ -77,8 +73,8 @@ agent_builder.add_edge("tool_node","llm_call")
 agent = agent_builder.compile()
 
 result = agent.invoke({
-    "messages": [HumanMessage(content="lol")],
-    "count": 0
+    "messages": [HumanMessage(content="Add 7 to the intial count, print it out to console, then subtract 3 print it out. Print nothing else.")],
+    "count": 4
     })
 
 for m in result["messages"]:
